@@ -35,7 +35,45 @@ def send_text_file(file_name):
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
 
+@app.route('/contact', method=["POST"])
+def contact():
+    if request.method=="POST":
+        from_name=request.form["name"]
+        subject=request.form["subject"]
+        from_email=request.form["email"]
+        msg=request.form["message"]
+        send_email(from_name,from_email,subject,msg)
+       
+        return redirect(url_for('home'))
+    return render_template('contact.html')
 
+def send_email(from_name,from_email,subject,msg):
+    from_addr = ''
+    to_addr = ''
+    from_name= ''
+    to_name=''
+    subject= 'Wazzup!'
+    msg='Hows it going bruh'
+    message = """From: {from_name} <{from_addr}>
+    To: {to_name} <{to_addr}>
+
+    Subject: {subject}
+    {msg}
+    """
+
+    message_to_send = message.format(from_name, from_addr, to_name,
+    to_addr, subject, msg)
+    # Credentials (if needed)
+    username = ''
+    password = ''
+    # The actual mail send
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.starttls()
+    server.login(username, password)
+    server.sendmail(from_addr, to_addr, message_to_send)
+    server.quit() 
+    
+    
 @app.after_request
 def add_header(response):
     """
